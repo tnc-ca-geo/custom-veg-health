@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "custom-veg-health"
+version = "0.1.0"
+description = "NDVI, NDMI and water-year precipitation for your own polygons, from TNC's GDE Pulse Landsat composites in Google Earth Engine"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = [
+    "earthengine-api>=1.4",
+    "geopandas>=1.0",
+    "pandas>=2.2",
+    "pyogrio>=0.10",
+    "questionary>=2.0",
+    "shapely>=2.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+custom-veg-health = "custom_veg_health.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/tnc-ca-geo/custom-veg-health"
+Methodology = "https://gde.codefornature.org/#/methodology"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["ee: calls Earth Engine; needs credentials and EE_PROJECT"]
+addopts = "-m 'not ee'"
