@@ -18,7 +18,7 @@ Composites start in 1985, and a new year is added about once a year.
 
 ## Install
 
-Needs Python 3.10 or later, and is developed and tested on 3.13. Check yours with `python3 --version`; for a fresh install, prefer 3.13 from [python.org](https://www.python.org/downloads/)
+Needs Python 3.10 or later, and is developed and tested on 3.13. Check yours with `python3 --version`. For a fresh install 3.13 from [python.org](https://www.python.org/downloads/)
 
 Install into a virtual environment rather than your system Python, so this tool's packages can't disturb anything else you use. You will need python3.13-venv if you are on Debian/Ubuntu
 
