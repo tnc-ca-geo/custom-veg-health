@@ -18,7 +18,7 @@ Composites start in 1985, and a new year is added about once a year.
 
 ## Install
 
-Needs Python 3.10 or later, and is developed and tested on 3.13. Check yours with `python3 --version`. For a fresh install 3.13 from [python.org](https://www.python.org/downloads/)
+Needs Python 3.10 or later, and is developed and tested on 3.13. Check yours with `python3 --version`; for a fresh install, prefer 3.13 from [python.org](https://www.python.org/downloads/)
 
 Install into a virtual environment rather than your system Python, so this tool's packages can't disturb anything else you use. You will need python3.13-venv if you are on Debian/Ubuntu
 
@@ -153,13 +153,32 @@ These are indicators, not measurements of groundwater use. NDVI and NDMI respond
 
 Polygons are sent to Earth Engine with each request. That keeps setup simple (no asset uploads or Cloud Storage) and suits jobs of a few hundred polygons. Very large jobs such as statewide runs should use custom approaches.
 
-## Development
+## Development Information
+
+Tests can be run as following:
 
 ```bash
 python3.13 -m venv .venv && .venv/bin/pip install -e ".[test]"
-.venv/bin/pytest # offline tests
-EE_PROJECT=my-ee-project .venv/bin/pytest -m ee   # parity with published GDE Pulse values
+.venv/bin/pytest                                  # offline tests, a second or two
+EE_PROJECT=my-ee-project .venv/bin/pytest -m ee   # calls Earth Engine (needs an internet connection)
 ```
+
+| File | What it holds |
+|---|---|
+| `src/custom_veg_health/imagery.py` | asset names, year discovery, the NDVI/NDMI and precipitation images |
+| `src/custom_veg_health/zonal.py` | reading and checking polygons, chunking, `reduceRegions`, retries, the output table |
+| `src/custom_veg_health/cli.py` | command line flags |
+| `src/custom_veg_health/interactive.py` | the guided prompts |
+| `tests/data/published_example.csv` | GDE Pulse's own values for `examples/example.gpkg`, taken from its bulk download |
+
+Every test except `test_parity_ee.py` runs offline: Earth Engine is replaced by fakes, so the suite is fast and needs no credentials. `-m ee` opts into the live check that results still match published GDE Pulse values (first run takes a few minutes. Earth Engine caches, so repeat runs are quicker).
+
+Worth knowing before changing things:
+
+- New composite years appear on their own. `available_years()` lists the collection and reads years out of names like `Landsat_SR_medoid_2025_2025_152_273`, so nothing needs bumping each year as long as that naming holds.
+- `--collection` is an undocumented flag for pointing at a different asset collection, which is handy for comparing against the older `projects/igde-work/raster-data/composite-collection` but not for normal users.
+- Results match GDE Pulse because of `scale=30`, `crs='EPSG:4326'` and Earth Engine's default weighted mean, copied from the production pipeline. Changing any of them changes the numbers. `pytest -m ee` is what will catch if your changes drift from the publicly posted values.
+- Problems a user can fix are raised as `SetupError`, and the message says how to fix them. The command line turns those into `error: ...` and exit code 2. Pleas continue to use this pattern.
 
 ## Credits and citation
 
