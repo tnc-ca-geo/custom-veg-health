@@ -18,7 +18,7 @@ Composites start in 1985, and a new year is added about once a year.
 
 ## Install
 
-Needs Python 3.10 or later, and is developed and tested on 3.13. Check yours with `python3 --version`; for a fresh install, prefer 3.13 from [python.org](https://www.python.org/downloads/)
+Needs Python 3.10 or later, and is developed and tested on 3.13. Check yours with `python3 --version`. If you don't already have python install 3.13 from [python.org](https://www.python.org/downloads/)
 
 Install into a virtual environment rather than your system Python, so this tool's packages can't disturb anything else you use. You will need python3.13-venv if you are on Debian/Ubuntu
 
@@ -52,20 +52,18 @@ Installing also gives you the `earthengine` command used in the next section.
 
 The tool runs on [Google Earth Engine](https://earthengine.google.com) under your own Google account. The imagery it reads is public.
 
-1. Register a Cloud project. Earth Engine requests are billed to a Google
+1. **Register a Cloud project.** Earth Engine requests are billed to a Google Cloud project. Register one at <https://console.cloud.google.com/earth-engine>, following Google's [access guide](https://developers.google.com/earth-engine/guides/access), which explains which option suits your organization. Note the project ID (for example `my-veg-health`) it is not always the same as the display name.
 
-Cloud project. Register one at <https://console.cloud.google.com/earth-engine>, following Google's [access guide](https://developers.google.com/earth-engine/guides/access), which explains which option suits your organization. Note the project ID (for example `my-veg-health`); it is not always the same as the display name.
+   If you need a commercial plan, the pay-as-you-go [Limited plan](https://cloud.google.com/earth-engine/pricing) is enough for this tool. 300 polygons over 41 years used about 1 EECU-hour, roughly $0.40 at September 2026 rates/billing structure.
 
-If you need a commercial plan, the pay-as-you-go [Limited plan](https://cloud.google.com/earth-engine/pricing) is enough for this tool. 300 polygons over 41 years used about 1 EECU-hour, roughly $0.40 at September 2026 rates/billing structure.
+2. **Sign in**, with your environment activated:
 
-2. Sign in, with your environment activated:
+   ```bash
+   earthengine authenticate                  # opens a browser
+   earthengine set_project my-veg-health     # optional: remember your project
+   ```
 
-```bash
-earthengine authenticate                  # opens a browser
-earthengine set_project my-veg-health     # optional: remember your project
-```
-
-Your sign-in is saved under your home folder (`~/.config/earthengine/`, or `%USERPROFILE%\.config\earthengine` on Windows) and lasts until you revoke it. You do not need the Google Cloud SDK (`gcloud`).
+   Your sign-in is saved under your home folder (`~/.config/earthengine/`, or `%USERPROFILE%\.config\earthengine` on Windows) and lasts until you revoke it. You do not need the Google Cloud SDK (`gcloud`).
 
 ## Run
 
@@ -90,7 +88,7 @@ custom-veg-health --polygons my_gdes.gpkg --id-field POLYGON_ID --project my-ee-
 This writes `my_gdes_veg_health.csv`. Other options:
 
 ```bash
---years 2010-2025        # or 2015,2020,2025; default is every available year
+--years 2010-2025        # or 2015,2020,2025. Default is every available year
 --output results.csv
 --layer NAME             # for files with several layers
 --no-precip
