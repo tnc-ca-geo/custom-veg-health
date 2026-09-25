@@ -68,14 +68,14 @@ def _explain(err: Exception, project: str | None) -> str:
     lowered = text.lower()
     if 'authenticate' in lowered or 'credentials' in lowered:
         hint = (
-            'No Earth Engine credentials were found. Run `earthengine '
-            'authenticate` (or pass --authenticate) and sign in with your own '
-            'Google account. No TNC account is needed.')
+            'No Earth Engine credentials were found. Pass --authenticate to '
+            'sign in (it opens a browser), or run the tool with no arguments '
+            'and it will offer to. Sign in with your own Google account. '
+            'No TNC account is needed.')
     elif not project:
         hint = (
             'Earth Engine needs a Google Cloud project. Pass '
-            '--project YOUR-PROJECT-ID, set EE_PROJECT, or run '
-            '`earthengine set_project YOUR-PROJECT-ID` once.')
+            '--project YOUR-PROJECT-ID or set EE_PROJECT.')
     elif 'not registered' in lowered or 'has not been used' in lowered \
             or 'disabled' in lowered:
         hint = f'Project {project!r} is not registered for Earth Engine.'

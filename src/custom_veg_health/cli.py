@@ -20,14 +20,24 @@ EXAMPLES = """
 Run with no arguments for guided prompts.
 
 examples:
-  custom-veg-health --polygons gdes.gpkg --id-field POLYGON_ID --project my-ee-project
-  custom-veg-health --polygons gdes.zip --id-field ID --years 2010-2025 -o out.csv
+  %(prog)s --polygons gdes.gpkg --id-field POLYGON_ID --project my-ee-project
+  %(prog)s --polygons gdes.zip --id-field ID --years 2010-2025 -o out.csv
 """
+
+
+def program_name() -> str:
+    """
+    How the tool was started, so help text and repeatable commands match what
+    the user typed: `python -m custom_veg_health` or `custom-veg-health`.
+    """
+    if Path(sys.argv[0]).name == '__main__.py':
+        return 'python -m custom_veg_health'
+    return 'custom-veg-health'
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog='custom-veg-health',
+        prog=program_name(),
         description=(
             'NDVI, NDMI and water-year precipitation for each of your '
             'polygons, from the GDE Pulse dry-season Landsat composites.'),
@@ -64,7 +74,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '-q', '--quiet', action='store_true', help='only print problems')
     parser.add_argument(
-        '--version', action='version', version=f'%(prog)s {__version__}')
+        '--version', action='version',
+        version=f'custom-veg-health {__version__}')
     return parser
 
 

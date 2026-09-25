@@ -18,35 +18,52 @@ Composites start in 1985, and a new year is added about once a year.
 
 ## Install
 
-Needs Python 3.10 or later, and is developed and tested on 3.13. Check yours with `python3 --version`. If you don't already have python install 3.13 from [python.org](https://www.python.org/downloads/)
+Needs Python 3.10 or later, and is developed and tested on 3.13.
 
-Install into a virtual environment rather than your system Python, so this tool's packages can't disturb anything else you use. You will need python3.13-venv if you are on Debian/Ubuntu
+**1. Open a terminal.**
+
+- **Windows:** click Start, type `PowerShell`, and open **Windows PowerShell**.
+- **macOS:** open **Terminal** (in Applications > Utilities).
+- **Linux:** open your usual terminal.
+
+Type each command below and press Enter.
+
+**2. Check your Python version.**
+
+- Windows: `py --version`
+- macOS and Linux: `python3 --version`
+
+It should print `Python 3.10` or newer (3.13 is best). If the command isn't found, or on Windows it opens the Microsoft Store, install Python 3.13 from [python.org](https://www.python.org/downloads/), then close and reopen the terminal. On Debian/Ubuntu you also need the `python3.13-venv` package.
+
+**3. Create an environment and install the tool.** The environment keeps this tool's packages separate from the rest of your computer.
+
+Windows (PowerShell):
+
+```powershell
+py -m venv "$HOME\Documents\veg-health-env"
+& "$HOME\Documents\veg-health-env\Scripts\Activate.ps1"
+python -m pip install git+https://github.com/tnc-ca-geo/custom-veg-health.git
+```
+
+Keep the `&` and the quotes on the second line: PowerShell won't run a path that starts with `$HOME` without them.
 
 macOS and Linux:
 
 ```bash
 python3 -m venv ~/veg-health-env
 source ~/veg-health-env/bin/activate
-pip install git+https://github.com/tnc-ca-geo/custom-veg-health
+python -m pip install git+https://github.com/tnc-ca-geo/custom-veg-health.git
 ```
 
-Windows (PowerShell):
+Once activated, your prompt starts with `(veg-health-env)`. **Run the activate line (the second line above) again each time you open a new terminal**, before using the tool. Type `deactivate` to leave. If you prefer conda or pipx, those work too.
 
-```powershell
-py -m venv $HOME\veg-health-env
-$HOME\veg-health-env\Scripts\Activate.ps1
-pip install git+https://github.com/tnc-ca-geo/custom-veg-health
+**4. Check it worked:**
+
+```
+python -m custom_veg_health --version
 ```
 
-Your prompt then starts with `(veg-health-env)`. Activate it again in each new terminal (the `source` or `Activate.ps1` line above) before running the tool. Type `deactivate` to leave. If you prefer conda or pipx, those work too.
-
-Check it worked:
-
-```bash
-custom-veg-health --version
-```
-
-Installing also gives you the `earthengine` command used in the next section.
+It prints the version, for example `custom-veg-health 0.1.0`. A shorter `custom-veg-health` command is installed too, but `python -m custom_veg_health` works in every setup, so the examples below use it.
 
 ## Earth Engine access
 
@@ -56,19 +73,18 @@ The tool runs on [Google Earth Engine](https://earthengine.google.com) under you
 
    If you need a commercial plan, the pay-as-you-go [Limited plan](https://cloud.google.com/earth-engine/pricing) is enough for this tool. 300 polygons over 41 years used about 1 EECU-hour, roughly $0.40 at September 2026 rates/billing structure.
 
-2. **Sign in**, with your environment activated:
+2. **Sign in.** The first time you run the tool with no arguments (see [Run](#run)), it offers to sign you in and opens a browser. To sign in on its own instead, with your environment activated:
 
-   ```bash
-   earthengine authenticate                  # opens a browser
-   earthengine set_project my-veg-health     # optional: remember your project
+   ```
+   python -c "import ee; ee.Authenticate()"
    ```
 
    Your sign-in is saved under your home folder (`~/.config/earthengine/`, or `%USERPROFILE%\.config\earthengine` on Windows) and lasts until you revoke it. You do not need the Google Cloud SDK (`gcloud`).
 
 ## Run
 
-```bash
-custom-veg-health
+```
+python -m custom_veg_health
 ```
 
 With no arguments, the tool walks you through each choice:
@@ -81,8 +97,8 @@ Before running, it shows a time estimate and the equivalent command.
 
 To skip the prompts for example in a script, pass the options directly:
 
-```bash
-custom-veg-health --polygons my_gdes.gpkg --id-field POLYGON_ID --project my-ee-project
+```
+python -m custom_veg_health --polygons my_gdes.gpkg --id-field POLYGON_ID --project my-ee-project
 ```
 
 This writes `my_gdes_veg_health.csv`. Other options:
@@ -98,10 +114,10 @@ Polygons can be a GeoPackage, shapefile (or a zip of one), GeoJSON, file geodata
 
 To try it on ten GDE polygons from the Natural Communities dataset:
 
-```bash
-git clone https://github.com/tnc-ca-geo/custom-veg-health && cd custom-veg-health
-custom-veg-health --polygons examples/example.gpkg --id-field polygon_id \
-    --project my-ee-project --years 2020-2025
+```
+git clone https://github.com/tnc-ca-geo/custom-veg-health
+cd custom-veg-health
+python -m custom_veg_health --polygons examples/example.gpkg --id-field polygon_id --project my-ee-project --years 2020-2025
 ```
 
 ### From Python
@@ -139,13 +155,16 @@ These are indicators, not measurements of groundwater use. NDVI and NDMI respond
 
 | Message | What to do |
 |---|---|
-| `command not found` / `not recognized` | Activate your environment: `source ~/veg-health-env/bin/activate` (`veg-health-env\Scripts\Activate.ps1` on Windows). |
-| `No Earth Engine credentials were found` | Run `earthengine authenticate`, or pass `--authenticate`. |
-| `Earth Engine needs a Google Cloud project` | Pass `--project`, set `EE_PROJECT`, or run `earthengine set_project`. |
+| `running scripts is disabled on this system` (Windows, when activating) | Run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` once, then run the activate line again. |
+| `No module named custom_veg_health`, or `not recognized` / `command not found` | The environment isn't active in this terminal. Run the activate line from [Install](#install) again. |
+| Not sure the environment is active | `python -c "import sys; print(sys.prefix)"` should print your `veg-health-env` folder. If it prints something else, activate first, then reinstall. |
+| `Cannot find command 'git'` while installing | Install without Git: `python -m pip install https://github.com/tnc-ca-geo/custom-veg-health/archive/refs/heads/main.zip` |
+| `No Earth Engine credentials were found` | Pass `--authenticate`, or run the tool with no arguments and it offers to sign you in. |
+| `Earth Engine needs a Google Cloud project` | Pass `--project` or set `EE_PROJECT`. |
 | `not registered` / `Earth Engine API has not been used in project ...` | Register that project. Check you used the project ID, not its display name. |
 | `Caller does not have required permission` | Check your account belongs to the project and its Earth Engine access is active. |
 | `No composite for 2026` | That year is not published yet. A new year is added about once a year, after the dry season. |
-| `redirect_uri_mismatch` while signing in | You are on a remote machine: `earthengine authenticate --quiet`. |
+| `redirect_uri_mismatch` while signing in | You are on a machine without a browser: `python -c "import ee; ee.Authenticate(quiet=True)"` |
 
 ## A few hundred polygons, not a hundred thousand
 

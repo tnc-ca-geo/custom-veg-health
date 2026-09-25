@@ -19,6 +19,7 @@ import questionary
 from questionary import Choice
 
 from . import imagery
+from .cli import program_name
 from .zonal import (
     MAX_FEATURES_PER_REQUEST, SETUP_DOCS, SetupError, describe_years, extract,
     initialize, parse_years, read_polygons, resolve_years)
@@ -178,7 +179,7 @@ def _run() -> int:
 
     output = _ask_output(default_output(path))
 
-    command = ['custom-veg-health', '--polygons', str(path),
+    command = [*program_name().split(), '--polygons', str(path),
                '--id-field', id_field, '--project', project]
     if len(layers) > 1:
         command += ['--layer', layer]
@@ -212,7 +213,8 @@ def _connect() -> str:
                 'confirm', 'You are not signed in to Earth Engine on this '
                 'computer. Sign in now? (opens a browser)', default=True):
             raise SetupError(
-                'Sign in with `earthengine authenticate`, then run again.\n'
+                'Sign in with `python -c "import ee; ee.Authenticate()"`, '
+                'then run again.\n'
                 f'Setup guide: {SETUP_DOCS}')
         authenticate = True
     project = (os.environ.get('EE_PROJECT')

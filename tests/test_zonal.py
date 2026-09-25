@@ -112,3 +112,15 @@ def test_explain_missing_credentials():
                        'account by running earthengine authenticate'), 'p')
     assert 'No TNC account is needed' in message
     assert ex.SETUP_DOCS in message
+
+
+@pytest.mark.parametrize('argv0, expected', [
+    ('/env/lib/site-packages/custom_veg_health/__main__.py',
+     'python -m custom_veg_health'),
+    ('/env/bin/custom-veg-health', 'custom-veg-health'),
+])
+def test_help_names_the_command_the_user_typed(monkeypatch, capsys, argv0, expected):
+    from custom_veg_health.cli import build_parser
+    monkeypatch.setattr('sys.argv', [argv0])
+    build_parser().print_help()
+    assert f'  {expected} --polygons gdes.gpkg' in capsys.readouterr().out
